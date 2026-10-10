@@ -18,7 +18,10 @@ export async function POST(req: Request) {
     const secretKey = process.env.DOKU_SECRET_KEY?.trim();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    
+    // Pastikan appUrl selalu dipangkas trailing slash-nya dan menggunakan fallback domain jagotka
+    const rawAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jagotka.vercel.app';
+    const appUrl = rawAppUrl.replace(/\/$/, '');
 
     if (!clientId || !secretKey || !serviceRoleKey) {
       return NextResponse.json(
@@ -68,6 +71,8 @@ export async function POST(req: Request) {
     const targetPath = '/checkout/v1/payment';
     const requestId = crypto.randomUUID();
     const requestTimestamp = new Date().toISOString().slice(0, 19) + 'Z';
+    
+    // URL Callback DOKU yang pasti mengarah ke domain jagotka
     const callbackUrl = `${appUrl}/payment-success?invoice_number=${invoiceNumber}`;
 
     const payload = {
